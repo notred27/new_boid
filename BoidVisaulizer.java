@@ -8,16 +8,24 @@ import javax.swing.*;
 public class BoidVisaulizer extends JPanel implements MouseInputListener{
 
 
-    int width = 500;
-    int height = 500;
+    private int width;
+    private int height;
+    private int border;
 
-    int mouseX = -1;
-    int mouseY = -1;
+    private int mouseX = -1;
+    private int mouseY = -1;
 
-    boolean followMouse = false;
+    private boolean followMouse = false;
+    private BoidEnvironment env;
+
+    public static boolean showVision = false;
 
     
-    public BoidVisaulizer() {
+    public BoidVisaulizer(BoidEnvironment env, int width, int height, int border) {
+        this.env = env;
+        this.width = width;
+        this.height = height;
+        this.border = border;
         this.setPreferredSize(new Dimension(width, height));
         this.addMouseListener(this);
         addMouseMotionListener(this);
@@ -25,12 +33,12 @@ public class BoidVisaulizer extends JPanel implements MouseInputListener{
             ActionListener taskPerformer = new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
                     if(followMouse){
-                        Boid.updatePosition();
+                        env.updatePosition();
 
                     } else {
                     // System.out.println(mouseX + " " + mouseY);
 
-                        Boid.updatePosition(mouseX, mouseY);
+                        env.updatePosition(mouseX, mouseY);
                     }
 
 
@@ -46,8 +54,17 @@ public class BoidVisaulizer extends JPanel implements MouseInputListener{
         m.clearRect(0, 0, width, height);
         m.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        for (Boid boid : Boid.getBoids()){
-            m.drawOval((int)boid.getX(),(int)boid.getY(), 5, 5);
+        m.setColor(new Color(200, 200, 200));
+        m.drawRect(border, border, width - border * 2, height - border * 2);
+        m.setColor(Color.BLACK);
+        for (Boid boid : env.getBoids()){
+            m.drawOval((int)boid.getX() - 2,(int)boid.getY() - 2, 4, 4);
+            if(showVision) {
+                m.setColor(Color.GREEN);
+                m.drawOval((int)boid.getX()  - ((int)env.OUTER_RANGE),(int)boid.getY() - ((int)env.OUTER_RANGE), (int)env.OUTER_RANGE * 2, (int)env.OUTER_RANGE * 2);
+                m.setColor(Color.BLACK);
+
+            }
         }
     }
 
